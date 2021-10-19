@@ -256,6 +256,7 @@ func doReplay(ctx *server.Context, state sm.State, stateStoreDB dbm.DB,
 		startDumpPprof()
 		defer stopDumpPprof()
 	}
+	ts := time.Now()
 	for height := lastBlockHeight + 1; height <= haltheight; height++ {
 		log.Println("replaying ", height)
 		block := originBlockStore.LoadBlock(height)
@@ -263,8 +264,12 @@ func doReplay(ctx *server.Context, state sm.State, stateStoreDB dbm.DB,
 		blockExec.SetIsAsyncDeliverTx(viper.GetBool(pallTx))
 		state, _, err = blockExec.ApplyBlock(state, meta.BlockID, block)
 		panicError(err)
-		SaveBlock(ctx, originBlockStore, height)
+		//SaveBlock(ctx, originBlockStore, height)
+		//if height>=lastBlockHeight+20{
+		//	break
+		//}
 	}
+	fmt.Println("allTs", time.Now().Sub(ts).Seconds())
 	fmt.Println("AllTxs", sm.AllTxs, "PallTxs", sm.PallTxs, "Conflict Txs", sm.AllTxs-sm.PallTxs)
 }
 

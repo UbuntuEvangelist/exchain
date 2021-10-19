@@ -1,8 +1,10 @@
 package keeper
 
 import (
+	"fmt"
 	"math/big"
 	"sync"
+	"time"
 
 	"github.com/okex/exchain/x/evm/types"
 )
@@ -12,6 +14,9 @@ func (k *Keeper) FixLog(execResults [][]string) [][]byte {
 	logSize := uint(0)
 	txInBlock := int(-1)
 	k.Bloom = new(big.Int)
+	ts := time.Now()
+	ttB := time.Duration(0)
+	ttE := time.Duration(0)
 
 	for index := 0; index < len(execResults); index++ {
 		rs, ok := k.LogsManages.Get(execResults[index][0])
@@ -29,14 +34,21 @@ func (k *Keeper) FixLog(execResults [][]string) [][]byte {
 			logSize++
 		}
 
+		ttBloom := time.Now()
 		k.Bloom = k.Bloom.Or(k.Bloom, rs.ResultData.Bloom.Big())
+		ttB += time.Now().Sub(ttBloom)
+
+		ttEncode := time.Now()
 		data, err := types.EncodeResultData(*rs.ResultData)
+		ttE += time.Now().Sub(ttEncode)
 		if err != nil {
 			panic(err)
 		}
+
 		res[index] = data
 	}
 	k.LogsManages.Reset()
+	fmt.Println("fixxxx (second)", ttB.Seconds(), ttE.Seconds(), time.Now().Sub(ts).Seconds())
 	return res
 }
 
