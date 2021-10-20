@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	"fmt"
 	"github.com/okex/exchain/x/evm/types"
 	"math/big"
 	"sync"
@@ -27,14 +28,14 @@ func (k *Keeper) FixLog(execResults [][]string) [][]byte {
 			v.TxIndex = uint(txInBlock)
 			logSize++
 		}
-		
+
 		k.Bloom = k.Bloom.Or(k.Bloom, rs.ResultData.Bloom.Big())
 
 		data, err := types.EncodeResultData(*rs.ResultData)
 		if err != nil {
 			panic(err)
 		}
-
+		fmt.Println("log.res", rs.Err, rs.ResultData)
 		res[index] = data
 	}
 	k.LogsManages.Reset()

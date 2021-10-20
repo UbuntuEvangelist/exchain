@@ -2,11 +2,11 @@ package types
 
 import (
 	"fmt"
+	"github.com/cosmos/cosmos-sdk/x/auth"
 	"math/big"
 	"sort"
 	"sync"
-
-	"github.com/cosmos/cosmos-sdk/x/auth"
+	"time"
 
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 
@@ -642,6 +642,13 @@ func (csdb *CommitStateDB) GetCodeHash(addr ethcmn.Address) ethcmn.Hash {
 
 // GetState retrieves a value from the given account's storage store.
 func (csdb *CommitStateDB) GetState(addr ethcmn.Address, hash ethcmn.Hash) ethcmn.Hash {
+	ts := time.Now()
+	defer func() {
+		tss := time.Now().Sub(ts).Microseconds()
+		if tss >= 0 {
+			//fmt.Println("GetState", tss, addr.String(), hash.String())
+		}
+	}()
 	if !csdb.ctx.IsCheckTx() {
 		funcName := analyzer.RunFuncName()
 		analyzer.StartTxLog(funcName)

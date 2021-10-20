@@ -1,6 +1,7 @@
 package evm
 
 import (
+	"fmt"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/ethereum/go-ethereum/common"
@@ -157,6 +158,8 @@ func handleMsgEthereumTx(ctx sdk.Context, k *Keeper, msg types.MsgEthereumTx) (*
 			ResultData: resultData,
 			Err:        err,
 		})
+	} else {
+		fmt.Println("log.res", err, resultData)
 	}
 
 	if err != nil {
