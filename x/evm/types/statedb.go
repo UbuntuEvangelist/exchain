@@ -646,7 +646,7 @@ func (csdb *CommitStateDB) GetState(addr ethcmn.Address, hash ethcmn.Hash) ethcm
 	defer func() {
 		tss := time.Now().Sub(ts).Microseconds()
 		if tss >= 0 {
-			//fmt.Println("GetState", tss, addr.String(), hash.String())
+			fmt.Println("GetState", tss, addr.String(), hash.String())
 		}
 	}()
 	if !csdb.ctx.IsCheckTx() {
