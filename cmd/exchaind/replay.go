@@ -7,6 +7,7 @@ import (
 	_ "net/http/pprof"
 	"os"
 	"path/filepath"
+	"runtime"
 	"runtime/pprof"
 	"time"
 
@@ -93,6 +94,7 @@ func replayCmd(ctx *server.Context) *cobra.Command {
 
 // replayBlock replays blocks from db, if something goes wrong, it will panic with error message.
 func replayBlock(ctx *server.Context, originDataDir string) {
+	runtime.GOMAXPROCS(4)
 	proxyApp, err := createProxyApp(ctx)
 	panicError(err)
 
