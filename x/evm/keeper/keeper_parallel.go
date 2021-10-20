@@ -1,7 +1,6 @@
 package keeper
 
 import (
-	"fmt"
 	"github.com/okex/exchain/x/evm/types"
 	"math/big"
 	"sync"
@@ -35,7 +34,7 @@ func (k *Keeper) FixLog(execResults [][]string) [][]byte {
 		if err != nil {
 			panic(err)
 		}
-		fmt.Println("log.res", rs.Err, rs.ResultData)
+		//fmt.Println("log.res", rs.Err, rs.ResultData)
 		res[index] = data
 	}
 	k.LogsManages.Reset()
