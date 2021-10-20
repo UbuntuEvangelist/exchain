@@ -254,6 +254,14 @@ func (csdb *CommitStateDB) SetParams(params Params) {
 
 // SetBalance sets the balance of an account.
 func (csdb *CommitStateDB) SetBalance(addr ethcmn.Address, amount *big.Int) {
+	ts := time.Now()
+	defer func() {
+		tss := time.Now().Sub(ts).Microseconds()
+		if tss >= 10 {
+			//fmt.Println("AddAddressToAccessList", tss)
+		}
+		CallNumner += tss
+	}()
 	so := csdb.GetOrNewStateObject(addr)
 	if so != nil {
 		so.SetBalance(amount)
@@ -262,6 +270,14 @@ func (csdb *CommitStateDB) SetBalance(addr ethcmn.Address, amount *big.Int) {
 
 // AddBalance adds amount to the account associated with addr.
 func (csdb *CommitStateDB) AddBalance(addr ethcmn.Address, amount *big.Int) {
+	ts := time.Now()
+	defer func() {
+		tss := time.Now().Sub(ts).Microseconds()
+		if tss >= 10 {
+			//fmt.Println("AddAddressToAccessList", tss)
+		}
+		CallNumner += tss
+	}()
 	if !csdb.ctx.IsCheckTx() {
 		funcName := analyzer.RunFuncName()
 		analyzer.StartTxLog(funcName)
@@ -276,6 +292,14 @@ func (csdb *CommitStateDB) AddBalance(addr ethcmn.Address, amount *big.Int) {
 
 // SubBalance subtracts amount from the account associated with addr.
 func (csdb *CommitStateDB) SubBalance(addr ethcmn.Address, amount *big.Int) {
+	ts := time.Now()
+	defer func() {
+		tss := time.Now().Sub(ts).Microseconds()
+		if tss >= 10 {
+			//fmt.Println("AddAddressToAccessList", tss)
+		}
+		CallNumner += tss
+	}()
 	if !csdb.ctx.IsCheckTx() {
 		funcName := analyzer.RunFuncName()
 		analyzer.StartTxLog(funcName)
@@ -290,6 +314,14 @@ func (csdb *CommitStateDB) SubBalance(addr ethcmn.Address, amount *big.Int) {
 
 // SetNonce sets the nonce (sequence number) of an account.
 func (csdb *CommitStateDB) SetNonce(addr ethcmn.Address, nonce uint64) {
+	ts := time.Now()
+	defer func() {
+		tss := time.Now().Sub(ts).Microseconds()
+		if tss >= 10 {
+			//fmt.Println("AddAddressToAccessList", tss)
+		}
+		CallNumner += tss
+	}()
 	if !csdb.ctx.IsCheckTx() {
 		funcName := analyzer.RunFuncName()
 		analyzer.StartTxLog(funcName)
@@ -304,6 +336,14 @@ func (csdb *CommitStateDB) SetNonce(addr ethcmn.Address, nonce uint64) {
 
 // SetState sets the storage state with a key, value pair for an account.
 func (csdb *CommitStateDB) SetState(addr ethcmn.Address, key, value ethcmn.Hash) {
+	ts := time.Now()
+	defer func() {
+		tss := time.Now().Sub(ts).Microseconds()
+		if tss >= 10 {
+			//fmt.Println("AddAddressToAccessList", tss)
+		}
+		CallNumner += tss
+	}()
 	if !csdb.ctx.IsCheckTx() {
 		funcName := analyzer.RunFuncName()
 		analyzer.StartTxLog(funcName)
@@ -318,6 +358,14 @@ func (csdb *CommitStateDB) SetState(addr ethcmn.Address, key, value ethcmn.Hash)
 
 // SetCode sets the code for a given account.
 func (csdb *CommitStateDB) SetCode(addr ethcmn.Address, code []byte) {
+	ts := time.Now()
+	defer func() {
+		tss := time.Now().Sub(ts).Microseconds()
+		if tss >= 10 {
+			//fmt.Println("AddAddressToAccessList", tss)
+		}
+		CallNumner += tss
+	}()
 	if !csdb.ctx.IsCheckTx() {
 		funcName := analyzer.RunFuncName()
 		analyzer.StartTxLog(funcName)
@@ -355,6 +403,14 @@ func (csdb *CommitStateDB) DeleteLogs(hash ethcmn.Hash) {
 
 // AddLog adds a new log to the state and sets the log metadata from the state.
 func (csdb *CommitStateDB) AddLog(log *ethtypes.Log) {
+	ts := time.Now()
+	defer func() {
+		tss := time.Now().Sub(ts).Microseconds()
+		if tss >= 10 {
+			//fmt.Println("AddAddressToAccessList", tss)
+		}
+		CallNumner += tss
+	}()
 	if !csdb.ctx.IsCheckTx() {
 		funcName := analyzer.RunFuncName()
 		analyzer.StartTxLog(funcName)
@@ -374,6 +430,14 @@ func (csdb *CommitStateDB) AddLog(log *ethtypes.Log) {
 
 // AddPreimage records a SHA3 preimage seen by the VM.
 func (csdb *CommitStateDB) AddPreimage(hash ethcmn.Hash, preimage []byte) {
+	ts := time.Now()
+	defer func() {
+		tss := time.Now().Sub(ts).Microseconds()
+		if tss >= 10 {
+			//fmt.Println("AddAddressToAccessList", tss)
+		}
+		CallNumner += tss
+	}()
 	if !csdb.ctx.IsCheckTx() {
 		funcName := analyzer.RunFuncName()
 		analyzer.StartTxLog(funcName)
@@ -393,6 +457,14 @@ func (csdb *CommitStateDB) AddPreimage(hash ethcmn.Hash, preimage []byte) {
 
 // AddRefund adds gas to the refund counter.
 func (csdb *CommitStateDB) AddRefund(gas uint64) {
+	ts := time.Now()
+	defer func() {
+		tss := time.Now().Sub(ts).Microseconds()
+		if tss >= 10 {
+			//fmt.Println("AddAddressToAccessList", tss)
+		}
+		CallNumner += tss
+	}()
 	if !csdb.ctx.IsCheckTx() {
 		funcName := analyzer.RunFuncName()
 		analyzer.StartTxLog(funcName)
@@ -406,6 +478,14 @@ func (csdb *CommitStateDB) AddRefund(gas uint64) {
 // SubRefund removes gas from the refund counter. It will panic if the refund
 // counter goes below zero.
 func (csdb *CommitStateDB) SubRefund(gas uint64) {
+	ts := time.Now()
+	defer func() {
+		tss := time.Now().Sub(ts).Microseconds()
+		if tss >= 10 {
+			//fmt.Println("AddAddressToAccessList", tss)
+		}
+		CallNumner += tss
+	}()
 	if !csdb.ctx.IsCheckTx() {
 		funcName := analyzer.RunFuncName()
 		analyzer.StartTxLog(funcName)
@@ -426,8 +506,9 @@ func (csdb *CommitStateDB) AddAddressToAccessList(addr ethcmn.Address) {
 	defer func() {
 		tss := time.Now().Sub(ts).Microseconds()
 		if tss >= 10 {
-			fmt.Println("AddAddressToAccessList", tss)
+			//fmt.Println("AddAddressToAccessList", tss)
 		}
+		CallNumner += tss
 	}()
 	if !csdb.ctx.IsCheckTx() {
 		funcName := analyzer.RunFuncName()
@@ -446,8 +527,9 @@ func (csdb *CommitStateDB) AddSlotToAccessList(addr ethcmn.Address, slot ethcmn.
 	defer func() {
 		tss := time.Now().Sub(ts).Microseconds()
 		if tss >= 10 {
-			fmt.Println("AddSlotToAccessList", tss)
+			//fmt.Println("AddSlotToAccessList", tss)
 		}
+		CallNumner += tss
 	}()
 	if !csdb.ctx.IsCheckTx() {
 		funcName := analyzer.RunFuncName()
@@ -475,8 +557,9 @@ func (csdb *CommitStateDB) PrepareAccessList(sender ethcmn.Address, dest *ethcmn
 	defer func() {
 		tss := time.Now().Sub(ts).Microseconds()
 		if tss >= 10 {
-			fmt.Println("PrepareAccessList", tss)
+			//fmt.Println("PrepareAccessList", tss)
 		}
+		CallNumner += tss
 	}()
 	if !csdb.ctx.IsCheckTx() {
 		funcName := analyzer.RunFuncName()
@@ -506,8 +589,9 @@ func (csdb *CommitStateDB) AddressInAccessList(addr ethcmn.Address) bool {
 	defer func() {
 		tss := time.Now().Sub(ts).Microseconds()
 		if tss >= 10 {
-			fmt.Println("AddressInAccessList", tss)
+			//fmt.Println("AddressInAccessList", tss)
 		}
+		CallNumner += tss
 	}()
 	if !csdb.ctx.IsCheckTx() {
 		funcName := analyzer.RunFuncName()
@@ -524,8 +608,9 @@ func (csdb *CommitStateDB) SlotInAccessList(addr ethcmn.Address, slot ethcmn.Has
 	defer func() {
 		tss := time.Now().Sub(ts).Microseconds()
 		if tss >= 10 {
-			fmt.Println("SlotInAccessList", tss)
+			//fmt.Println("SlotInAccessList", tss)
 		}
+		CallNumner += tss
 	}()
 	if !csdb.ctx.IsCheckTx() {
 		funcName := analyzer.RunFuncName()
@@ -569,8 +654,9 @@ func (csdb *CommitStateDB) GetBalance(addr ethcmn.Address) *big.Int {
 	defer func() {
 		tss := time.Now().Sub(ts).Microseconds()
 		if tss >= 10 {
-			fmt.Println("GetBalance", tss)
+			//fmt.Println("GetBalance", tss)
 		}
+		CallNumner += tss
 	}()
 	if !csdb.ctx.IsCheckTx() {
 		funcName := analyzer.RunFuncName()
@@ -592,8 +678,9 @@ func (csdb *CommitStateDB) GetNonce(addr ethcmn.Address) uint64 {
 	defer func() {
 		tss := time.Now().Sub(ts).Microseconds()
 		if tss >= 10 {
-			fmt.Println("GetNonce", tss)
+			//fmt.Println("GetNonce", tss)
 		}
+		CallNumner += tss
 	}()
 	if !csdb.ctx.IsCheckTx() {
 		funcName := analyzer.RunFuncName()
@@ -629,8 +716,9 @@ func (csdb *CommitStateDB) GetCode(addr ethcmn.Address) []byte {
 	defer func() {
 		tss := time.Now().Sub(ts).Microseconds()
 		if tss >= 10 {
-			fmt.Println("GetCode", tss)
+			//fmt.Println("GetCode", tss)
 		}
+		CallNumner += tss
 	}()
 	if !csdb.ctx.IsCheckTx() {
 		funcName := analyzer.RunFuncName()
@@ -657,8 +745,9 @@ func (csdb *CommitStateDB) GetCodeByHash(hash ethcmn.Hash) []byte {
 	defer func() {
 		tss := time.Now().Sub(ts).Microseconds()
 		if tss >= 10 {
-			fmt.Println("GetCodeByHash", tss, hash.String())
+			//fmt.Println("GetCodeByHash", tss, hash.String())
 		}
+		CallNumner += tss
 	}()
 	ctx := csdb.ctx
 	store := csdb.dbAdapter.NewStore(ctx.KVStore(csdb.storeKey), KeyPrefixCode)
@@ -673,8 +762,9 @@ func (csdb *CommitStateDB) GetCodeSize(addr ethcmn.Address) int {
 	defer func() {
 		tss := time.Now().Sub(ts).Microseconds()
 		if tss >= 10 {
-			fmt.Println("GetCodeSize", tss, addr.String())
+			//fmt.Println("GetCodeSize", tss, addr.String())
 		}
+		CallNumner += tss
 	}()
 	if !csdb.ctx.IsCheckTx() {
 		funcName := analyzer.RunFuncName()
@@ -700,8 +790,9 @@ func (csdb *CommitStateDB) GetCodeHash(addr ethcmn.Address) ethcmn.Hash {
 	defer func() {
 		tss := time.Now().Sub(ts).Microseconds()
 		if tss >= 10 {
-			fmt.Println("GetCodeHash", tss, addr.String())
+			//fmt.Println("GetCodeHash", tss, addr.String())
 		}
+		CallNumner += tss
 	}()
 	if !csdb.ctx.IsCheckTx() {
 		funcName := analyzer.RunFuncName()
@@ -723,8 +814,9 @@ func (csdb *CommitStateDB) GetState(addr ethcmn.Address, hash ethcmn.Hash) ethcm
 	defer func() {
 		tss := time.Now().Sub(ts).Microseconds()
 		if tss >= 10 {
-			fmt.Println("GetState", tss, addr.String(), hash.String())
+			//fmt.Println("GetState", tss, addr.String(), hash.String())
 		}
+		CallNumner += tss
 	}()
 	if !csdb.ctx.IsCheckTx() {
 		funcName := analyzer.RunFuncName()
@@ -746,8 +838,9 @@ func (csdb *CommitStateDB) GetStateByKey(addr ethcmn.Address, hash ethcmn.Hash) 
 	defer func() {
 		tss := time.Now().Sub(ts).Microseconds()
 		if tss >= 10 {
-			fmt.Println("GetStateByKey", tss, addr.String(), hash.String())
+			//fmt.Println("GetStateByKey", tss, addr.String(), hash.String())
 		}
+		CallNumner += tss
 	}()
 	ctx := csdb.ctx
 	store := csdb.dbAdapter.NewStore(ctx.KVStore(csdb.storeKey), AddressStoragePrefix(addr))
@@ -763,8 +856,9 @@ func (csdb *CommitStateDB) GetCommittedState(addr ethcmn.Address, hash ethcmn.Ha
 	defer func() {
 		tss := time.Now().Sub(ts).Microseconds()
 		if tss >= 10 {
-			fmt.Println("GetCommittedState", tss, addr.String(), hash.String())
+			//fmt.Println("GetCommittedState", tss, addr.String(), hash.String())
 		}
+		CallNumner += tss
 	}()
 	if !csdb.ctx.IsCheckTx() {
 		funcName := analyzer.RunFuncName()
@@ -842,8 +936,9 @@ func (csdb *CommitStateDB) Commit(deleteEmptyObjects bool) (ethcmn.Hash, error) 
 	defer func() {
 		tss := time.Now().Sub(ts).Microseconds()
 		if tss >= 10 {
-			fmt.Println("Commit", tss)
+			//fmt.Println("Commit", tss)
 		}
+		CallNumner += tss
 	}()
 	defer csdb.clearJournalAndRefund()
 
@@ -892,8 +987,9 @@ func (csdb *CommitStateDB) Finalise(deleteEmptyObjects bool) error {
 	defer func() {
 		tss := time.Now().Sub(ts).Microseconds()
 		if tss >= 10 {
-			fmt.Println("Finalise", tss)
+			//fmt.Println("Finalise", tss)
 		}
+		CallNumner += tss
 	}()
 	for _, dirty := range csdb.journal.dirties {
 		idx, exist := csdb.addressToObjectIndex[dirty.address]

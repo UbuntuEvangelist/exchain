@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"math/big"
+	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -106,6 +107,11 @@ func (st StateTransition) newEVM(
 	return vm.NewEVM(blockCtx, txCtx, csdb, config.EthereumConfig(st.ChainID), vmConfig)
 }
 
+var (
+	CallNumner = int64(0)
+	Flag       = bool(false)
+)
+
 // TransitionDb will transition the state by applying the current transaction and
 // returning the evm execution result.
 // NOTE: State transition checks are run during AnteHandler execution.
@@ -158,7 +164,6 @@ func (st StateTransition) TransitionDb(ctx sdk.Context, config ChainConfig) (exe
 		}
 	}
 
-
 	params := csdb.GetParams()
 
 	evm := st.newEVM(ctx, csdb, gasLimit, st.Price, config, params.ExtraEIPs)
@@ -202,8 +207,10 @@ func (st StateTransition) TransitionDb(ctx sdk.Context, config ChainConfig) (exe
 		csdb.SetNonce(st.Sender, csdb.GetNonce(st.Sender)+1)
 		StartTxLog(analyzer.EVMCORE)
 		defer StopTxLog(analyzer.EVMCORE)
+		ts := time.Now()
+		CallNumner = 0
 		ret, leftOverGas, err = evm.Call(senderRef, *st.Recipient, st.Payload, gasLimit, st.Amount)
-
+		fmt.Println("call-end", time.Now().Sub(ts).Microseconds(), CallNumner, "gas", gasLimit-leftOverGas)
 		recipientLog = fmt.Sprintf("recipient address %s", st.Recipient.String())
 	}
 
