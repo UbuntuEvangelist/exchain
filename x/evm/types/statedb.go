@@ -422,6 +422,13 @@ func (csdb *CommitStateDB) SubRefund(gas uint64) {
 
 // AddAddressToAccessList adds the given address to the access list
 func (csdb *CommitStateDB) AddAddressToAccessList(addr ethcmn.Address) {
+	ts := time.Now()
+	defer func() {
+		tss := time.Now().Sub(ts).Microseconds()
+		if tss >= 10 {
+			fmt.Println("AddAddressToAccessList", tss)
+		}
+	}()
 	if !csdb.ctx.IsCheckTx() {
 		funcName := analyzer.RunFuncName()
 		analyzer.StartTxLog(funcName)
@@ -435,6 +442,13 @@ func (csdb *CommitStateDB) AddAddressToAccessList(addr ethcmn.Address) {
 
 // AddSlotToAccessList adds the given (address, slot)-tuple to the access list
 func (csdb *CommitStateDB) AddSlotToAccessList(addr ethcmn.Address, slot ethcmn.Hash) {
+	ts := time.Now()
+	defer func() {
+		tss := time.Now().Sub(ts).Microseconds()
+		if tss >= 10 {
+			fmt.Println("AddSlotToAccessList", tss)
+		}
+	}()
 	if !csdb.ctx.IsCheckTx() {
 		funcName := analyzer.RunFuncName()
 		analyzer.StartTxLog(funcName)
@@ -457,6 +471,13 @@ func (csdb *CommitStateDB) AddSlotToAccessList(addr ethcmn.Address, slot ethcmn.
 	}
 }
 func (csdb *CommitStateDB) PrepareAccessList(sender ethcmn.Address, dest *ethcmn.Address, precompiles []ethcmn.Address, txAccesses ethtypes.AccessList) {
+	ts := time.Now()
+	defer func() {
+		tss := time.Now().Sub(ts).Microseconds()
+		if tss >= 10 {
+			fmt.Println("PrepareAccessList", tss)
+		}
+	}()
 	if !csdb.ctx.IsCheckTx() {
 		funcName := analyzer.RunFuncName()
 		analyzer.StartTxLog(funcName)
@@ -481,6 +502,13 @@ func (csdb *CommitStateDB) PrepareAccessList(sender ethcmn.Address, dest *ethcmn
 
 // AddressInAccessList returns true if the given address is in the access list.
 func (csdb *CommitStateDB) AddressInAccessList(addr ethcmn.Address) bool {
+	ts := time.Now()
+	defer func() {
+		tss := time.Now().Sub(ts).Microseconds()
+		if tss >= 10 {
+			fmt.Println("AddressInAccessList", tss)
+		}
+	}()
 	if !csdb.ctx.IsCheckTx() {
 		funcName := analyzer.RunFuncName()
 		analyzer.StartTxLog(funcName)
@@ -492,6 +520,13 @@ func (csdb *CommitStateDB) AddressInAccessList(addr ethcmn.Address) bool {
 
 // SlotInAccessList returns true if the given (address, slot)-tuple is in the access list.
 func (csdb *CommitStateDB) SlotInAccessList(addr ethcmn.Address, slot ethcmn.Hash) (bool, bool) {
+	ts := time.Now()
+	defer func() {
+		tss := time.Now().Sub(ts).Microseconds()
+		if tss >= 10 {
+			fmt.Println("SlotInAccessList", tss)
+		}
+	}()
 	if !csdb.ctx.IsCheckTx() {
 		funcName := analyzer.RunFuncName()
 		analyzer.StartTxLog(funcName)
@@ -530,6 +565,13 @@ func (csdb *CommitStateDB) GetParams() Params {
 // GetBalance retrieves the balance from the given address or 0 if object not
 // found.
 func (csdb *CommitStateDB) GetBalance(addr ethcmn.Address) *big.Int {
+	ts := time.Now()
+	defer func() {
+		tss := time.Now().Sub(ts).Microseconds()
+		if tss >= 10 {
+			fmt.Println("GetBalance", tss)
+		}
+	}()
 	if !csdb.ctx.IsCheckTx() {
 		funcName := analyzer.RunFuncName()
 		analyzer.StartTxLog(funcName)
@@ -546,6 +588,13 @@ func (csdb *CommitStateDB) GetBalance(addr ethcmn.Address) *big.Int {
 
 // GetNonce returns the nonce (sequence number) for a given account.
 func (csdb *CommitStateDB) GetNonce(addr ethcmn.Address) uint64 {
+	ts := time.Now()
+	defer func() {
+		tss := time.Now().Sub(ts).Microseconds()
+		if tss >= 10 {
+			fmt.Println("GetNonce", tss)
+		}
+	}()
 	if !csdb.ctx.IsCheckTx() {
 		funcName := analyzer.RunFuncName()
 		analyzer.StartTxLog(funcName)
@@ -576,6 +625,13 @@ func (csdb *CommitStateDB) SetBlockHash(hash ethcmn.Hash) {
 
 // GetCode returns the code for a given account.
 func (csdb *CommitStateDB) GetCode(addr ethcmn.Address) []byte {
+	ts := time.Now()
+	defer func() {
+		tss := time.Now().Sub(ts).Microseconds()
+		if tss >= 10 {
+			fmt.Println("GetCode", tss)
+		}
+	}()
 	if !csdb.ctx.IsCheckTx() {
 		funcName := analyzer.RunFuncName()
 		analyzer.StartTxLog(funcName)
@@ -597,6 +653,13 @@ func (csdb *CommitStateDB) GetCode(addr ethcmn.Address) []byte {
 
 // GetCode returns the code for a given code hash.
 func (csdb *CommitStateDB) GetCodeByHash(hash ethcmn.Hash) []byte {
+	ts := time.Now()
+	defer func() {
+		tss := time.Now().Sub(ts).Microseconds()
+		if tss >= 10 {
+			fmt.Println("GetCodeByHash", tss, hash.String())
+		}
+	}()
 	ctx := csdb.ctx
 	store := csdb.dbAdapter.NewStore(ctx.KVStore(csdb.storeKey), KeyPrefixCode)
 	code := store.Get(hash.Bytes())
@@ -606,6 +669,13 @@ func (csdb *CommitStateDB) GetCodeByHash(hash ethcmn.Hash) []byte {
 
 // GetCodeSize returns the code size for a given account.
 func (csdb *CommitStateDB) GetCodeSize(addr ethcmn.Address) int {
+	ts := time.Now()
+	defer func() {
+		tss := time.Now().Sub(ts).Microseconds()
+		if tss >= 10 {
+			fmt.Println("GetCodeSize", tss, addr.String())
+		}
+	}()
 	if !csdb.ctx.IsCheckTx() {
 		funcName := analyzer.RunFuncName()
 		analyzer.StartTxLog(funcName)
@@ -626,6 +696,13 @@ func (csdb *CommitStateDB) GetCodeSize(addr ethcmn.Address) int {
 
 // GetCodeHash returns the code hash for a given account.
 func (csdb *CommitStateDB) GetCodeHash(addr ethcmn.Address) ethcmn.Hash {
+	ts := time.Now()
+	defer func() {
+		tss := time.Now().Sub(ts).Microseconds()
+		if tss >= 10 {
+			fmt.Println("GetCodeHash", tss, addr.String())
+		}
+	}()
 	if !csdb.ctx.IsCheckTx() {
 		funcName := analyzer.RunFuncName()
 		analyzer.StartTxLog(funcName)
@@ -645,7 +722,7 @@ func (csdb *CommitStateDB) GetState(addr ethcmn.Address, hash ethcmn.Hash) ethcm
 	ts := time.Now()
 	defer func() {
 		tss := time.Now().Sub(ts).Microseconds()
-		if tss >= 0 {
+		if tss >= 10 {
 			fmt.Println("GetState", tss, addr.String(), hash.String())
 		}
 	}()
@@ -665,6 +742,13 @@ func (csdb *CommitStateDB) GetState(addr ethcmn.Address, hash ethcmn.Hash) ethcm
 
 // GetStateByKey retrieves a value from the given account's storage store.
 func (csdb *CommitStateDB) GetStateByKey(addr ethcmn.Address, hash ethcmn.Hash) ethcmn.Hash {
+	ts := time.Now()
+	defer func() {
+		tss := time.Now().Sub(ts).Microseconds()
+		if tss >= 10 {
+			fmt.Println("GetStateByKey", tss, addr.String(), hash.String())
+		}
+	}()
 	ctx := csdb.ctx
 	store := csdb.dbAdapter.NewStore(ctx.KVStore(csdb.storeKey), AddressStoragePrefix(addr))
 	data := store.Get(hash.Bytes())
@@ -675,6 +759,13 @@ func (csdb *CommitStateDB) GetStateByKey(addr ethcmn.Address, hash ethcmn.Hash) 
 // GetCommittedState retrieves a value from the given account's committed
 // storage.
 func (csdb *CommitStateDB) GetCommittedState(addr ethcmn.Address, hash ethcmn.Hash) ethcmn.Hash {
+	ts := time.Now()
+	defer func() {
+		tss := time.Now().Sub(ts).Microseconds()
+		if tss >= 10 {
+			fmt.Println("GetCommittedState", tss, addr.String(), hash.String())
+		}
+	}()
 	if !csdb.ctx.IsCheckTx() {
 		funcName := analyzer.RunFuncName()
 		analyzer.StartTxLog(funcName)
@@ -747,6 +838,13 @@ func (csdb *CommitStateDB) StorageTrie(addr ethcmn.Address) ethstate.Trie {
 // state (storage) updated. In addition, the state object (account) itself will
 // be written. Finally, the root hash (version) will be returned.
 func (csdb *CommitStateDB) Commit(deleteEmptyObjects bool) (ethcmn.Hash, error) {
+	ts := time.Now()
+	defer func() {
+		tss := time.Now().Sub(ts).Microseconds()
+		if tss >= 10 {
+			fmt.Println("Commit", tss)
+		}
+	}()
 	defer csdb.clearJournalAndRefund()
 
 	// remove dirty state object entries based on the journal
@@ -790,6 +888,13 @@ func (csdb *CommitStateDB) Commit(deleteEmptyObjects bool) (ethcmn.Hash, error) 
 // removing the csdb destructed objects and clearing the journal as well as the
 // refunds.
 func (csdb *CommitStateDB) Finalise(deleteEmptyObjects bool) error {
+	ts := time.Now()
+	defer func() {
+		tss := time.Now().Sub(ts).Microseconds()
+		if tss >= 10 {
+			fmt.Println("Finalise", tss)
+		}
+	}()
 	for _, dirty := range csdb.journal.dirties {
 		idx, exist := csdb.addressToObjectIndex[dirty.address]
 		if !exist {
