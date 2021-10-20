@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/tendermint/tendermint/libs/log"
 	"math/big"
 	"time"
 
@@ -210,7 +211,12 @@ func (st StateTransition) TransitionDb(ctx sdk.Context, config ChainConfig) (exe
 		ts := time.Now()
 		CallNumner = 0
 		ret, leftOverGas, err = evm.Call(senderRef, *st.Recipient, st.Payload, gasLimit, st.Amount)
-		fmt.Println("call-end", time.Now().Sub(ts).Microseconds(), CallNumner, "gas", gasLimit-leftOverGas)
+
+		if log.Display() {
+			//fmt.Println("scf-call-end", time.Now().Sub(ts).Microseconds(), CallNumner, "gas", gasLimit-leftOverGas)
+			log.SetfirstAndSecond(time.Now().Sub(ts).Microseconds(), CallNumner, gasLimit-leftOverGas)
+		}
+
 		recipientLog = fmt.Sprintf("recipient address %s", st.Recipient.String())
 	}
 
