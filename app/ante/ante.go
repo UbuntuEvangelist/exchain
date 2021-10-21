@@ -1,12 +1,15 @@
 package ante
 
 import (
+	"fmt"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	authante "github.com/cosmos/cosmos-sdk/x/auth/ante"
 	"github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
+	"github.com/tendermint/tendermint/libs/log"
+	"time"
 
 	"github.com/okex/exchain/app/crypto/ethsecp256k1"
 	evmtypes "github.com/okex/exchain/x/evm/types"
@@ -145,6 +148,12 @@ func NewAccountBlockedVerificationDecorator(evmKeeper EVMKeeper) AccountBlockedV
 
 // AnteHandle check wether signer of tx(contains cosmos-tx and eth-tx) is blocked.
 func (abvd AccountBlockedVerificationDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, next sdk.AnteHandler) (sdk.Context, error) {
+	ts := time.Now()
+	defer func() {
+		if log.Display() {
+			fmt.Println("EthSigVerificationDecorator", time.Now().Sub(ts).Microseconds())
+		}
+	}()
 	signers, err := getSigners(tx)
 	if err != nil {
 		return ctx, err
