@@ -38,7 +38,8 @@ const (
 	pprofAddrFlag    = "pprof_addr"
 	runWithPprofFlag = "gen_pprof"
 
-	pallTx = "pall_tx"
+	pallTx    = "pall_tx"
+	saveBlock = "save_block"
 
 	defaulPprofFileFlags = os.O_RDWR | os.O_CREATE | os.O_APPEND
 	defaultPprofFilePerm = 0644
@@ -88,6 +89,7 @@ func replayCmd(ctx *server.Context) *cobra.Command {
 	cmd.Flags().BoolVar(&tmiavl.EnableAsyncCommit, tmiavl.FlagIavlEnableAsyncCommit, false, "Enable cache iavl node data to optimization leveldb pruning process")
 	cmd.Flags().Bool(runWithPprofFlag, false, "Dump the pprof of the entire replay process")
 	cmd.Flags().Bool(pallTx, false, "pall Tx")
+	cmd.Flags().Bool(saveBlock, false, "save block when replay")
 	return cmd
 }
 
@@ -194,20 +196,19 @@ func initChain(state sm.State, stateDB dbm.DB, genDoc *types.GenesisDoc, proxyAp
 }
 
 var (
-	alreadyInit = false
-	nowbb       dbm.DB
+	alreadyInit  bool
+	stateStoreDb *store.BlockStore
 )
 
 // TODO need delete
 func SaveBlock(ctx *server.Context, originDB *store.BlockStore, height int64) {
 	if !alreadyInit {
-		var err error
 		alreadyInit = true
 		dataDir := filepath.Join(ctx.Config.RootDir, "data")
-		nowbb, err = openDB(blockStoreDB, dataDir)
+		blockStoreDB, err := openDB(blockStoreDB, dataDir)
 		panicError(err)
+		stateStoreDb = store.NewBlockStore(blockStoreDB)
 	}
-	stateStoreDb := store.NewBlockStore(nowbb)
 
 	block := originDB.LoadBlock(height)
 	meta := originDB.LoadBlockMeta(height)
@@ -257,6 +258,8 @@ func doReplay(ctx *server.Context, state sm.State, stateStoreDB dbm.DB,
 		defer stopDumpPprof()
 	}
 	ts := time.Now()
+
+	needSaveBlock := viper.GetBool(saveBlock)
 	for height := lastBlockHeight + 1; height <= haltheight; height++ {
 		log.Println("replaying ", height)
 		block := originBlockStore.LoadBlock(height)
@@ -267,71 +270,82 @@ func doReplay(ctx *server.Context, state sm.State, stateStoreDB dbm.DB,
 		SaveBlock(ctx, originBlockStore, height)
 		if height >= lastBlockHeight+1000 {
 			break
+			if needSaveBlock {
+				SaveBlock(ctx, originBlockStore, height)
+			}
 		}
-	}
-	fmt.Println("allTs", time.Now().Sub(ts).Seconds())
-	fmt.Println("AllTxs", sm.AllTxs, "PallTxs", sm.PallTxs, "Conflict Txs", sm.AllTxs-sm.PallTxs)
-}
-
-func startDumpPprof() {
-	var (
-		binarySuffix = time.Now().Format("20060102150405") + ".bin"
-	)
-	fileName := fmt.Sprintf("replay_pprof_%s", binarySuffix)
-	bf, err := os.OpenFile(fileName, defaulPprofFileFlags, defaultPprofFilePerm)
-	if err != nil {
-		fmt.Printf("open pprof file(%s) error:%s\n", fileName, err.Error())
-		return
+		fmt.Println("allTs", time.Now().Sub(ts).Seconds())
+		fmt.Println("AllTxs", sm.AllTxs, "PallTxs", sm.PallTxs, "Conflict Txs", sm.AllTxs-sm.PallTxs)
 	}
 
-	err = pprof.StartCPUProfile(bf)
-	if err != nil {
-		fmt.Printf("dump pprof StartCPUProfile error:%s\n", err.Error())
-		return
+	func
+	startDumpPprof()
+	{
+		var (
+			binarySuffix = time.Now().Format("20060102150405") + ".bin"
+		)
+		fileName := fmt.Sprintf("replay_pprof_%s", binarySuffix)
+		bf, err := os.OpenFile(fileName, defaulPprofFileFlags, defaultPprofFilePerm)
+		if err != nil {
+			fmt.Printf("open pprof file(%s) error:%s\n", fileName, err.Error())
+			return
+		}
+
+		err = pprof.StartCPUProfile(bf)
+		if err != nil {
+			fmt.Printf("dump pprof StartCPUProfile error:%s\n", err.Error())
+			return
+		}
+		fmt.Printf("start to dump pprof file(%s)\n", fileName)
 	}
-	fmt.Printf("start to dump pprof file(%s)\n", fileName)
-}
 
-func stopDumpPprof() {
-	pprof.StopCPUProfile()
-	fmt.Printf("dump pprof successfully\n")
-}
+	func
+	stopDumpPprof()
+	{
+		pprof.StopCPUProfile()
+		fmt.Printf("dump pprof successfully\n")
+	}
 
-func newMockProxyApp(appHash []byte, abciResponses *sm.ABCIResponses) proxy.AppConnConsensus {
-	clientCreator := proxy.NewLocalClientCreator(&mockProxyApp{
+	func
+	newMockProxyApp(appHash[]
+	byte, abciResponses * sm.ABCIResponses) proxy.AppConnConsensus{
+		clientCreator, := proxy.NewLocalClientCreator(&mockProxyApp{
 		appHash:       appHash,
 		abciResponses: abciResponses,
 	})
-	cli, _ := clientCreator.NewABCIClient()
-	err := cli.Start()
-	if err != nil {
+		cli, _ := clientCreator.NewABCIClient()
+		err := cli.Start()
+		if err != nil{
 		panic(err)
 	}
-	return proxy.NewAppConnConsensus(cli)
-}
+		return proxy.NewAppConnConsensus(cli)
+	}
 
-type mockProxyApp struct {
-	abci.BaseApplication
+	type mockProxyApp struct {
+		abci.BaseApplication
 
-	appHash       []byte
-	txCount       int
-	abciResponses *sm.ABCIResponses
-}
+		appHash       []byte
+		txCount       int
+		abciResponses *sm.ABCIResponses
+	}
 
-func (mock *mockProxyApp) DeliverTx(req abci.RequestDeliverTx) abci.ResponseDeliverTx {
-	r := mock.abciResponses.DeliverTxs[mock.txCount]
-	mock.txCount++
-	if r == nil { //it could be nil because of amino unMarshall, it will cause an empty ResponseDeliverTx to become nil
+	func(mock *mockProxyApp) DeliverTx(req
+	abci.RequestDeliverTx) abci.ResponseDeliverTx{
+		r, := mock.abciResponses.DeliverTxs[mock.txCount]
+		mock.txCount++
+		if r == nil{ //it could be nil because of amino unMarshall, it will cause an empty ResponseDeliverTx to become nil
 		return abci.ResponseDeliverTx{}
 	}
-	return *r
-}
+		return *r
+	}
 
-func (mock *mockProxyApp) EndBlock(req abci.RequestEndBlock) abci.ResponseEndBlock {
-	mock.txCount = 0
-	return *mock.abciResponses.EndBlock
-}
+	func(mock *mockProxyApp) EndBlock(req
+	abci.RequestEndBlock) abci.ResponseEndBlock{
+		mock.txCount, = 0
+		return *mock.abciResponses.EndBlock
+	}
 
-func (mock *mockProxyApp) Commit() abci.ResponseCommit {
-	return abci.ResponseCommit{Data: mock.appHash}
-}
+	func(mock *mockProxyApp) Commit()
+	abci.ResponseCommit{
+		return abci.ResponseCommit{Data: mock.appHash}
+	}
