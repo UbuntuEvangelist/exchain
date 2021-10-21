@@ -151,7 +151,7 @@ func (abvd AccountBlockedVerificationDecorator) AnteHandle(ctx sdk.Context, tx s
 	ts := time.Now()
 	defer func() {
 		if log.Display() {
-			fmt.Println("EthSigVerificationDecorator", time.Now().Sub(ts).Microseconds())
+			fmt.Println("AccountBlockedVerificationDecorator", time.Now().Sub(ts).Microseconds())
 		}
 	}()
 	signers, err := getSigners(tx)
