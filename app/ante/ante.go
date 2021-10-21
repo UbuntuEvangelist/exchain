@@ -149,11 +149,6 @@ func NewAccountBlockedVerificationDecorator(evmKeeper EVMKeeper) AccountBlockedV
 // AnteHandle check wether signer of tx(contains cosmos-tx and eth-tx) is blocked.
 func (abvd AccountBlockedVerificationDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, next sdk.AnteHandler) (sdk.Context, error) {
 	ts := time.Now()
-	defer func() {
-		if log.Display() {
-			fmt.Println("AccountBlockedVerificationDecorator", time.Now().Sub(ts).Microseconds())
-		}
-	}()
 	signers, err := getSigners(tx)
 	if err != nil {
 		return ctx, err
@@ -169,6 +164,9 @@ func (abvd AccountBlockedVerificationDecorator) AnteHandle(ctx sdk.Context, tx s
 		}
 	}
 	ctx = ctx.WithGasMeter(currentGasMeter)
+	if log.Display() {
+		fmt.Println("AccountBlockedVerificationDecorator", time.Now().Sub(ts).Microseconds())
+	}
 	return next(ctx, tx, simulate)
 }
 

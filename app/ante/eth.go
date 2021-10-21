@@ -44,11 +44,6 @@ func NewEthSetupContextDecorator() EthSetupContextDecorator {
 // ethereum tx GasLimit.
 func (escd EthSetupContextDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, next sdk.AnteHandler) (newCtx sdk.Context, err error) {
 	ts := time.Now()
-	defer func() {
-		if log.Display() {
-			fmt.Println("EthSetupContextDecorator", time.Now().Sub(ts).Microseconds())
-		}
-	}()
 	// all transactions must implement GasTx
 	gasTx, ok := tx.(authante.GasTx)
 	if !ok {
@@ -75,6 +70,9 @@ func (escd EthSetupContextDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simu
 		}
 	}()
 
+	if log.Display() {
+		fmt.Println("EthSetupContextDecorator", time.Now().Sub(ts).Microseconds())
+	}
 	return next(ctx, tx, simulate)
 }
 
@@ -98,11 +96,6 @@ func NewEthMempoolFeeDecorator(ek EVMKeeper) EthMempoolFeeDecorator {
 // NOTE: This should only be run during a CheckTx mode.
 func (emfd EthMempoolFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, next sdk.AnteHandler) (newCtx sdk.Context, err error) {
 	ts := time.Now()
-	defer func() {
-		if log.Display() {
-			fmt.Println("EthMempoolFeeDecorator", time.Now().Sub(ts).Microseconds())
-		}
-	}()
 	if !ctx.IsCheckTx() {
 		return next(ctx, tx, simulate)
 	}
@@ -136,7 +129,9 @@ func (emfd EthMempoolFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simula
 			fmt.Sprintf("insufficient fee, got: %q required: %q", fee, sdk.NewDecCoinFromDec(evmDenom, minFees)),
 		)
 	}
-
+	if log.Display() {
+		fmt.Println("EthMempoolFeeDecorator", time.Now().Sub(ts).Microseconds())
+	}
 	return next(ctx, tx, simulate)
 }
 
@@ -151,11 +146,6 @@ func NewEthSigVerificationDecorator() EthSigVerificationDecorator {
 // AnteHandle validates the signature and returns sender address
 func (esvd EthSigVerificationDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, next sdk.AnteHandler) (newCtx sdk.Context, err error) {
 	ts := time.Now()
-	defer func() {
-		if log.Display() {
-			fmt.Println("EthSigVerificationDecorator", time.Now().Sub(ts).Microseconds())
-		}
-	}()
 	msgEthTx, ok := tx.(evmtypes.MsgEthereumTx)
 	if !ok {
 		return ctx, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "invalid transaction type: %T", tx)
@@ -175,7 +165,9 @@ func (esvd EthSigVerificationDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, s
 
 	// update ctx for push signerSigCache
 	newCtx = ctx.WithSigCache(signerSigCache)
-
+	if log.Display() {
+		fmt.Println("EthSigVerificationDecorator", time.Now().Sub(ts).Microseconds())
+	}
 	// NOTE: when signature verification succeeds, a non-empty signer address can be
 	// retrieved from the transaction on the next AnteDecorators.
 	return next(newCtx, msgEthTx, simulate)
@@ -198,11 +190,6 @@ func NewAccountVerificationDecorator(ak auth.AccountKeeper, ek EVMKeeper) Accoun
 // AnteHandle validates the signature and returns sender address
 func (avd AccountVerificationDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, next sdk.AnteHandler) (newCtx sdk.Context, err error) {
 	ts := time.Now()
-	defer func() {
-		if log.Display() {
-			fmt.Println("AccountVerificationDecorator", time.Now().Sub(ts).Microseconds())
-		}
-	}()
 	if !ctx.IsCheckTx() {
 		return next(ctx, tx, simulate)
 	}
@@ -243,6 +230,9 @@ func (avd AccountVerificationDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, s
 		)
 	}
 
+	if log.Display() {
+		fmt.Println("AccountVerificationDecorator", time.Now().Sub(ts).Microseconds())
+	}
 	return next(ctx, tx, simulate)
 }
 
@@ -263,11 +253,6 @@ func NewNonceVerificationDecorator(ak auth.AccountKeeper) NonceVerificationDecor
 // current nonce).
 func (nvd NonceVerificationDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, next sdk.AnteHandler) (newCtx sdk.Context, err error) {
 	ts := time.Now()
-	defer func() {
-		if log.Display() {
-			fmt.Println("NonceVerificationDecorator", time.Now().Sub(ts).Microseconds())
-		}
-	}()
 	msgEthTx, ok := tx.(evmtypes.MsgEthereumTx)
 	if !ok {
 		return ctx, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "invalid transaction type: %T", tx)
@@ -358,6 +343,9 @@ func (nvd NonceVerificationDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, sim
 		}
 	}
 
+	if log.Display() {
+		fmt.Println("NonceVerificationDecorator", time.Now().Sub(ts).Microseconds())
+	}
 	return next(ctx, tx, simulate)
 }
 
@@ -387,11 +375,7 @@ func NewEthGasConsumeDecorator(ak auth.AccountKeeper, sk types.SupplyKeeper, ek 
 // supplied with the transaction.
 func (egcd EthGasConsumeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, next sdk.AnteHandler) (newCtx sdk.Context, err error) {
 	ts := time.Now()
-	defer func() {
-		if log.Display() {
-			fmt.Println("EthGasConsumeDecorator", time.Now().Sub(ts).Microseconds())
-		}
-	}()
+	tt := time.Now()
 	msgEthTx, ok := tx.(evmtypes.MsgEthereumTx)
 	if !ok {
 		return ctx, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "invalid transaction type: %T", tx)
@@ -403,6 +387,9 @@ func (egcd EthGasConsumeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simula
 		panic("sender address cannot be empty")
 	}
 
+	if log.Display() {
+		fmt.Println("from01", time.Now().Sub(tt).Microseconds())
+	}
 	// fetch sender account from signature
 	senderAcc, err := auth.GetSignerAcc(ctx, egcd.ak, address)
 	if err != nil {
@@ -414,6 +401,9 @@ func (egcd EthGasConsumeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simula
 			sdkerrors.ErrUnknownAddress,
 			"sender account %s (%s) is nil", common.BytesToAddress(address.Bytes()), address,
 		)
+	}
+	if log.Display() {
+		fmt.Println("from0-2", time.Now().Sub(tt).Microseconds())
 	}
 
 	gasLimit := msgEthTx.GetGas()
@@ -444,6 +434,9 @@ func (egcd EthGasConsumeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simula
 		}
 	}
 
+	if log.Display() {
+		fmt.Println("EthGasConsumeDecorator", time.Now().Sub(ts).Microseconds())
+	}
 	// Set gas meter after ante handler to ignore gaskv costs
 	newCtx = auth.SetGasMeter(simulate, ctx, gasLimit)
 	return next(newCtx, tx, simulate)
@@ -468,11 +461,6 @@ func NewIncrementSenderSequenceDecorator(ak auth.AccountKeeper) IncrementSenderS
 // AnteHandle handles incrementing the sequence of the sender.
 func (issd IncrementSenderSequenceDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, next sdk.AnteHandler) (sdk.Context, error) {
 	ts := time.Now()
-	defer func() {
-		if log.Display() {
-			fmt.Println("IncrementSenderSequenceDecorator", time.Now().Sub(ts).Microseconds())
-		}
-	}()
 	// always incrementing the sequence when ctx is recheckTx mode (when mempool in disableRecheck mode, we will also has force recheck),
 	// when mempool is in enableRecheck mode, we will need to increase the nonce when ctx is checkTx mode
 	// when mempool is not in enableRecheck mode, we should not increment the nonce
@@ -495,6 +483,7 @@ func (issd IncrementSenderSequenceDecorator) AnteHandle(ctx sdk.Context, tx sdk.
 
 	// increment sequence of all signers
 	for _, addr := range msgEthTx.GetSigners() {
+		tt := time.Now()
 		acc := issd.ak.GetAccount(ctx, addr)
 		seq := acc.GetSequence()
 		if !baseapp.IsMempoolEnablePendingPool() {
@@ -506,8 +495,14 @@ func (issd IncrementSenderSequenceDecorator) AnteHandle(ctx sdk.Context, tx sdk.
 			panic(err)
 		}
 		issd.ak.SetAccount(ctx, acc)
-	}
+		if log.Display() {
+			fmt.Println("????sender++", time.Now().Sub(tt).Microseconds())
+		}
 
+	}
+	if log.Display() {
+		fmt.Println("IncrementSenderSequenceDecorator", time.Now().Sub(ts).Microseconds())
+	}
 	// set the original gas meter
 	ctx = ctx.WithGasMeter(gasMeter)
 	return next(ctx, tx, simulate)
@@ -527,17 +522,15 @@ type GasLimitDecorator struct {
 // AnteHandle handles incrementing the sequence of the sender.
 func (g GasLimitDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, next sdk.AnteHandler) (sdk.Context, error) {
 	ts := time.Now()
-	defer func() {
-		if log.Display() {
-			fmt.Println("GasLimitDecorator", time.Now().Sub(ts).Microseconds())
-		}
-	}()
 	msgEthTx, ok := tx.(evmtypes.MsgEthereumTx)
 	if !ok {
 		return ctx, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "invalid transaction type: %T", tx)
 	}
 	if msgEthTx.GetGas() > g.evm.GetParams(ctx).MaxGasLimitPerTx {
 		return ctx, sdkerrors.Wrapf(sdkerrors.ErrTxTooLarge, "too large gas limit, it must be less than %d", g.evm.GetParams(ctx).MaxGasLimitPerTx)
+	}
+	if log.Display() {
+		fmt.Println("GasLimitDecorator", time.Now().Sub(ts).Microseconds())
 	}
 	return next(ctx, tx, simulate)
 }
