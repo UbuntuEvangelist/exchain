@@ -266,12 +266,12 @@ func doReplay(ctx *server.Context, state sm.State, stateStoreDB dbm.DB,
 		blockExec.SetIsAsyncDeliverTx(viper.GetBool(sm.FlagParalleledTx))
 		state, _, err = blockExec.ApplyBlock(state, meta.BlockID, block)
 		panicError(err)
-		SaveBlock(ctx, originBlockStore, height)
+		//SaveBlock(ctx, originBlockStore, height)
 		if height >= lastBlockHeight+1000 {
 			break
 		}
 	}
-	fmt.Printf("replay end all ts", time.Now().Sub(ts).Seconds())
+	fmt.Println("replay end all ts", time.Now().Sub(ts).Seconds())
 }
 func startDumpPprof() {
 	var (
