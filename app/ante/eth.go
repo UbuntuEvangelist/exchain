@@ -162,12 +162,13 @@ func (esvd EthSigVerificationDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, s
 	if err != nil {
 		return ctx, sdkerrors.Wrapf(sdkerrors.ErrUnauthorized, "signature verification failed: %s", err.Error())
 	}
-
+	
 	// update ctx for push signerSigCache
 	newCtx = ctx.WithSigCache(signerSigCache)
 	if log.Display() {
 		fmt.Println("EthSigVerificationDecorator", time.Now().Sub(ts).Microseconds())
 	}
+
 	// NOTE: when signature verification succeeds, a non-empty signer address can be
 	// retrieved from the transaction on the next AnteDecorators.
 	return next(newCtx, msgEthTx, simulate)

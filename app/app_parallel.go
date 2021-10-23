@@ -6,6 +6,7 @@ import (
 	authante "github.com/cosmos/cosmos-sdk/x/auth/ante"
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	"github.com/cosmos/cosmos-sdk/x/supply"
+	ethcmn "github.com/ethereum/go-ethereum/common"
 	"github.com/okex/exchain/x/evm"
 	evmtypes "github.com/okex/exchain/x/evm/types"
 )
@@ -19,9 +20,12 @@ func updateFeeCollectorHandler(bk bank.Keeper, sk supply.Keeper) sdk.UpdateFeeCo
 
 // evmTxFeeHandler get tx fee for evm tx
 func evmTxFeeHandler() sdk.GetTxFeeHandler {
-	return func(tx sdk.Tx) (fee sdk.Coins, isEvm bool) {
-		if _, ok := tx.(evmtypes.MsgEthereumTx); ok {
+	return func(ctx sdk.Context, tx sdk.Tx) (fee sdk.Coins, isEvm bool, signerCache sdk.SigCache, from ethcmn.Address, to *ethcmn.Address) {
+		if evmTx, ok := tx.(evmtypes.MsgEthereumTx); ok {
 			isEvm = true
+			signerCache, _ = evmTx.VerifySig(evmTx.ChainID(), ctx.BlockHeight(), ctx.SigCache())
+			from = ethcmn.BytesToAddress(evmTx.From())
+			to = evmTx.To()
 		}
 		if feeTx, ok := tx.(authante.FeeTx); ok {
 			fee = feeTx.GetFee()

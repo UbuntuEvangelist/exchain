@@ -257,7 +257,8 @@ func doReplay(ctx *server.Context, state sm.State, stateStoreDB dbm.DB,
 		startDumpPprof()
 		defer stopDumpPprof()
 	}
-	
+
+	ts := time.Now()
 	for height := lastBlockHeight + 1; height <= haltheight; height++ {
 		log.Println("replaying ", height)
 		block := originBlockStore.LoadBlock(height)
@@ -270,6 +271,7 @@ func doReplay(ctx *server.Context, state sm.State, stateStoreDB dbm.DB,
 			break
 		}
 	}
+	fmt.Printf("replay end all ts", time.Now().Sub(ts).Seconds())
 }
 func startDumpPprof() {
 	var (

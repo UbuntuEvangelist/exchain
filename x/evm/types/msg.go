@@ -9,6 +9,7 @@ import (
 	"sync/atomic"
 
 	"github.com/cosmos/cosmos-sdk/x/auth/ante"
+	"github.com/tendermint/tendermint/libs/log"
 	"github.com/tendermint/tendermint/mempool"
 
 	"github.com/okex/exchain/app/types"
@@ -403,6 +404,14 @@ func (msg *MsgEthereumTx) VerifySig(chainID *big.Int, height int64, sigCtx sdk.S
 		sigHash = msg.HomesteadSignHash()
 	}
 
+	if log.Display() {
+		fmt.Println("jisaun-----")
+		//debug.PrintStack()
+
+		//TODO check !!!!!
+		//panic("dsadada")
+	}
+
 	sender, err := recoverEthSig(msg.Data.R, msg.Data.S, V, sigHash)
 	if err != nil {
 		return nil, err
@@ -464,7 +473,7 @@ func (msg *MsgEthereumTx) From() sdk.AccAddress {
 		return nil
 	}
 
-	return sdk.AccAddress(sigCache.from.Bytes())
+	return sigCache.from.Bytes()
 }
 
 // deriveChainID derives the chain id from the given v parameter
