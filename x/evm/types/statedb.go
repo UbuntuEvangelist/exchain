@@ -122,6 +122,8 @@ type CommitStateDB struct {
 	codeCache map[ethcmn.Address]CacheCode
 
 	dbAdapter DbAdapter
+	TsAll     time.Duration
+	TsSpecial time.Duration
 }
 
 type StoreProxy interface {
@@ -199,16 +201,28 @@ func CreateEmptyCommitStateDB(csdbParams CommitStateDBParams, ctx sdk.Context) *
 }
 
 func (csdb *CommitStateDB) SetInternalDb(dba DbAdapter) {
+	ts := time.Now()
+	defer func() {
+		csdb.TsAll += time.Now().Sub(ts)
+	}()
 	csdb.dbAdapter = dba
 }
 
 // WithContext returns a Database with an updated SDK context
 func (csdb *CommitStateDB) WithContext(ctx sdk.Context) *CommitStateDB {
+	ts := time.Now()
+	defer func() {
+		csdb.TsAll += time.Now().Sub(ts)
+	}()
 	csdb.ctx = ctx
 	return csdb
 }
 
 func (csdb *CommitStateDB) GetCacheCode(addr ethcmn.Address) *CacheCode {
+	ts := time.Now()
+	defer func() {
+		csdb.TsAll += time.Now().Sub(ts)
+	}()
 	if !csdb.ctx.IsCheckTx() {
 		funcName := analyzer.RunFuncName()
 		analyzer.StartTxLog(funcName)
@@ -224,6 +238,10 @@ func (csdb *CommitStateDB) GetCacheCode(addr ethcmn.Address) *CacheCode {
 }
 
 func (csdb *CommitStateDB) IteratorCode(cb func(addr ethcmn.Address, c CacheCode) bool) {
+	ts := time.Now()
+	defer func() {
+		csdb.TsAll += time.Now().Sub(ts)
+	}()
 	for addr, v := range csdb.codeCache {
 		cb(addr, v)
 	}
@@ -235,6 +253,10 @@ func (csdb *CommitStateDB) IteratorCode(cb func(addr ethcmn.Address, c CacheCode
 
 // SetHeightHash sets the block header hash associated with a given height.
 func (csdb *CommitStateDB) SetHeightHash(height uint64, hash ethcmn.Hash) {
+	ts := time.Now()
+	defer func() {
+		csdb.TsAll += time.Now().Sub(ts)
+	}()
 	if !csdb.ctx.IsCheckTx() {
 		funcName := analyzer.RunFuncName()
 		analyzer.StartTxLog(funcName)
@@ -248,6 +270,10 @@ func (csdb *CommitStateDB) SetHeightHash(height uint64, hash ethcmn.Hash) {
 
 // SetParams sets the evm parameters to the param space.
 func (csdb *CommitStateDB) SetParams(params Params) {
+	ts := time.Now()
+	defer func() {
+		csdb.TsAll += time.Now().Sub(ts)
+	}()
 	csdb.params = &params
 	csdb.paramSpace.SetParamSet(csdb.ctx, &params)
 }
@@ -256,12 +282,9 @@ func (csdb *CommitStateDB) SetParams(params Params) {
 func (csdb *CommitStateDB) SetBalance(addr ethcmn.Address, amount *big.Int) {
 	ts := time.Now()
 	defer func() {
-		tss := time.Now().Sub(ts).Microseconds()
-		if tss >= 10 {
-			//fmt.Println("AddAddressToAccessList", tss)
-		}
-		CallNumner += tss
+		csdb.TsAll += time.Now().Sub(ts)
 	}()
+
 	so := csdb.GetOrNewStateObject(addr)
 	if so != nil {
 		so.SetBalance(amount)
@@ -270,6 +293,10 @@ func (csdb *CommitStateDB) SetBalance(addr ethcmn.Address, amount *big.Int) {
 
 // AddBalance adds amount to the account associated with addr.
 func (csdb *CommitStateDB) AddBalance(addr ethcmn.Address, amount *big.Int) {
+	ts := time.Now()
+	defer func() {
+		csdb.TsAll += time.Now().Sub(ts)
+	}()
 	ts := time.Now()
 	defer func() {
 		tss := time.Now().Sub(ts).Microseconds()
@@ -294,12 +321,9 @@ func (csdb *CommitStateDB) AddBalance(addr ethcmn.Address, amount *big.Int) {
 func (csdb *CommitStateDB) SubBalance(addr ethcmn.Address, amount *big.Int) {
 	ts := time.Now()
 	defer func() {
-		tss := time.Now().Sub(ts).Microseconds()
-		if tss >= 10 {
-			//fmt.Println("AddAddressToAccessList", tss)
-		}
-		CallNumner += tss
+		csdb.TsAll += time.Now().Sub(ts)
 	}()
+
 	if !csdb.ctx.IsCheckTx() {
 		funcName := analyzer.RunFuncName()
 		analyzer.StartTxLog(funcName)
@@ -316,11 +340,7 @@ func (csdb *CommitStateDB) SubBalance(addr ethcmn.Address, amount *big.Int) {
 func (csdb *CommitStateDB) SetNonce(addr ethcmn.Address, nonce uint64) {
 	ts := time.Now()
 	defer func() {
-		tss := time.Now().Sub(ts).Microseconds()
-		if tss >= 10 {
-			//fmt.Println("AddAddressToAccessList", tss)
-		}
-		CallNumner += tss
+		csdb.TsAll += time.Now().Sub(ts)
 	}()
 	if !csdb.ctx.IsCheckTx() {
 		funcName := analyzer.RunFuncName()
