@@ -295,10 +295,6 @@ func (csdb *CommitStateDB) SetBalance(addr ethcmn.Address, amount *big.Int) {
 func (csdb *CommitStateDB) AddBalance(addr ethcmn.Address, amount *big.Int) {
 	ts := time.Now()
 	defer func() {
-		csdb.TsAll += time.Now().Sub(ts)
-	}()
-	ts := time.Now()
-	defer func() {
 		tss := time.Now().Sub(ts).Microseconds()
 		if tss >= 10 {
 			//fmt.Println("AddAddressToAccessList", tss)
