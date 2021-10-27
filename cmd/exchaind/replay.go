@@ -267,9 +267,9 @@ func doReplay(ctx *server.Context, state sm.State, stateStoreDB dbm.DB,
 		state, _, err = blockExec.ApplyBlock(state, meta.BlockID, block)
 		panicError(err)
 		SaveBlock(ctx, originBlockStore, height)
-		if height >= lastBlockHeight+1000 {
-			break
-		}
+		//if height >= lastBlockHeight+1000 {
+		//	break
+		//}
 	}
 	fmt.Println("replay end all ts", time.Now().Sub(ts).Seconds())
 }
