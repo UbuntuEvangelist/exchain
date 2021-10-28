@@ -43,7 +43,6 @@ func NewEthSetupContextDecorator() EthSetupContextDecorator {
 // This is undone at the EthGasConsumeDecorator, where the context is set with the
 // ethereum tx GasLimit.
 func (escd EthSetupContextDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, next sdk.AnteHandler) (newCtx sdk.Context, err error) {
-	ts := time.Now()
 	// all transactions must implement GasTx
 	gasTx, ok := tx.(authante.GasTx)
 	if !ok {
@@ -70,9 +69,6 @@ func (escd EthSetupContextDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simu
 		}
 	}()
 
-	if log.Display() {
-		fmt.Println("EthSetupContextDecorator", time.Now().Sub(ts).Microseconds())
-	}
 	return next(ctx, tx, simulate)
 }
 
@@ -162,11 +158,11 @@ func (esvd EthSigVerificationDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, s
 	if err != nil {
 		return ctx, sdkerrors.Wrapf(sdkerrors.ErrUnauthorized, "signature verification failed: %s", err.Error())
 	}
-	
+
 	// update ctx for push signerSigCache
 	newCtx = ctx.WithSigCache(signerSigCache)
 	if log.Display() {
-		fmt.Println("EthSigVerificationDecorator", time.Now().Sub(ts).Microseconds())
+		fmt.Println("EthSigVerificationDecorator", time.Now().Sub(ts).Microseconds(), ctx.SigCache() == nil)
 	}
 
 	// NOTE: when signature verification succeeds, a non-empty signer address can be
@@ -265,6 +261,7 @@ func (nvd NonceVerificationDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, sim
 		panic("sender address cannot be empty")
 	}
 
+	fmt.Println("adddd", time.Now().Sub(ts).Microseconds(), address.String(), ctx.GasMeter().GasConsumed())
 	acc := nvd.ak.GetAccount(ctx, address)
 	if acc == nil {
 		return ctx, sdkerrors.Wrapf(
@@ -272,6 +269,7 @@ func (nvd NonceVerificationDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, sim
 			"account %s (%s) is nil", common.BytesToAddress(address.Bytes()), address,
 		)
 	}
+	fmt.Println("addd---", ctx.GasMeter().GasConsumed())
 
 	seq := acc.GetSequence()
 	// if multiple transactions are submitted in succession with increasing nonces,
@@ -343,7 +341,6 @@ func (nvd NonceVerificationDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, sim
 			)
 		}
 	}
-
 	if log.Display() {
 		fmt.Println("NonceVerificationDecorator", time.Now().Sub(ts).Microseconds())
 	}
@@ -376,7 +373,6 @@ func NewEthGasConsumeDecorator(ak auth.AccountKeeper, sk types.SupplyKeeper, ek 
 // supplied with the transaction.
 func (egcd EthGasConsumeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, next sdk.AnteHandler) (newCtx sdk.Context, err error) {
 	ts := time.Now()
-	tt := time.Now()
 	msgEthTx, ok := tx.(evmtypes.MsgEthereumTx)
 	if !ok {
 		return ctx, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "invalid transaction type: %T", tx)
@@ -388,9 +384,6 @@ func (egcd EthGasConsumeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simula
 		panic("sender address cannot be empty")
 	}
 
-	if log.Display() {
-		fmt.Println("from01", time.Now().Sub(tt).Microseconds())
-	}
 	// fetch sender account from signature
 	senderAcc, err := auth.GetSignerAcc(ctx, egcd.ak, address)
 	if err != nil {
@@ -403,10 +396,6 @@ func (egcd EthGasConsumeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simula
 			"sender account %s (%s) is nil", common.BytesToAddress(address.Bytes()), address,
 		)
 	}
-	if log.Display() {
-		fmt.Println("from0-2", time.Now().Sub(tt).Microseconds())
-	}
-
 	gasLimit := msgEthTx.GetGas()
 	gas, err := ethcore.IntrinsicGas(msgEthTx.Data.Payload, []ethtypes.AccessTuple{}, msgEthTx.To() == nil, true, false)
 	if err != nil {
@@ -484,7 +473,6 @@ func (issd IncrementSenderSequenceDecorator) AnteHandle(ctx sdk.Context, tx sdk.
 
 	// increment sequence of all signers
 	for _, addr := range msgEthTx.GetSigners() {
-		tt := time.Now()
 		acc := issd.ak.GetAccount(ctx, addr)
 		seq := acc.GetSequence()
 		if !baseapp.IsMempoolEnablePendingPool() {
@@ -496,9 +484,6 @@ func (issd IncrementSenderSequenceDecorator) AnteHandle(ctx sdk.Context, tx sdk.
 			panic(err)
 		}
 		issd.ak.SetAccount(ctx, acc)
-		if log.Display() {
-			fmt.Println("????sender++", time.Now().Sub(tt).Microseconds())
-		}
 
 	}
 	if log.Display() {
