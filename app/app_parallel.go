@@ -24,6 +24,10 @@ func evmTxFeeHandler(ak auth.AccountKeeper) sdk.GetTxFeeHandler {
 			isEvm = true
 			signerCache, _ = evmTx.VerifySig(evmTx.ChainID(), ctx.BlockHeight(), ctx.SigCache())
 			ak.GetAccount(ctx, evmTx.From())
+
+			if evmTx.To() != nil {
+				ak.GetAccount(ctx, (*evmTx.To()).Bytes())
+			}
 		}
 		if feeTx, ok := tx.(authante.FeeTx); ok {
 			fee = feeTx.GetFee()
