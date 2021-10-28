@@ -260,8 +260,7 @@ func (nvd NonceVerificationDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, sim
 	if address.Empty() {
 		panic("sender address cannot be empty")
 	}
-
-	fmt.Println("adddd", time.Now().Sub(ts).Microseconds(), address.String(), ctx.GasMeter().GasConsumed())
+	
 	acc := nvd.ak.GetAccount(ctx, address)
 	if acc == nil {
 		return ctx, sdkerrors.Wrapf(
@@ -269,7 +268,6 @@ func (nvd NonceVerificationDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, sim
 			"account %s (%s) is nil", common.BytesToAddress(address.Bytes()), address,
 		)
 	}
-	fmt.Println("addd---", ctx.GasMeter().GasConsumed())
 
 	seq := acc.GetSequence()
 	// if multiple transactions are submitted in succession with increasing nonces,
