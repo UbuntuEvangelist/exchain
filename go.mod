@@ -20,12 +20,12 @@ require (
 	github.com/gorilla/websocket v1.4.2
 	github.com/hashicorp/golang-lru v0.5.5-0.20210104140557-80c98217689d
 	github.com/jinzhu/gorm v1.9.16
-	github.com/json-iterator/go v1.1.9
+	github.com/json-iterator/go v1.1.11
 	github.com/miguelmota/go-ethereum-hdwallet v0.0.0-20210614093730-56a4d342a6ff
 	github.com/mosn/holmes v0.0.0-20210830110104-685dc05437bf
 	github.com/nacos-group/nacos-sdk-go v1.0.0
 	github.com/pkg/errors v0.9.1
-	github.com/prometheus/client_golang v1.5.1
+	github.com/prometheus/client_golang v1.11.1
 	github.com/segmentio/kafka-go v0.2.2
 	github.com/shopspring/decimal v1.2.0
 	github.com/spf13/cobra v1.1.1
