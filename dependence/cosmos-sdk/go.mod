@@ -31,7 +31,7 @@ require (
 	github.com/tendermint/iavl v0.14.1
 	github.com/tendermint/tendermint v0.33.9
 	github.com/tendermint/tm-db v0.5.2
-	golang.org/x/net v0.0.0-20201010224723-4f7140c49acb // indirect
+	golang.org/x/net v0.7.0 // indirect
 	google.golang.org/protobuf v1.25.0 // indirect
 	gopkg.in/yaml.v2 v2.3.0
 )
